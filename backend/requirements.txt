@@ -1,0 +1,26 @@
+Flask==2.2.3
+Flask-SQLAlchemy==2.5.1
+Flask-JWT-Extended==4.4.3
+Werkzeug==2.2.3
+pandas==1.5.3
+SQLAlchemy==1.4.41
+mysql-connector-python==8.0.32
+redis==4.5.1
+Flask-Caching==1.10.1
+prophet
+
+
+# Explanation:
+
+# 1. Flask - The main web framework you're using.
+# 2. Flask-SQLAlchemy - The extension for SQLAlchemy database support.
+# 3. Flask-JWT-Extended - For handling JWT-based authentication.
+# 4. Werkzeug - The utility for password hashing and security.
+# 5. pandas - For handling DataFrame operations.
+# 6. SQLAlchemy - The database ORM (separately listed for SQLAlchemy usage).
+# 7. mysql-connector-python - MySQL connection library for your database.
+# 8. redis - For caching support.
+# 9. Flask-Caching - An extension for caching with Redis.
+
+# You can install these dependencies by running the following command in your virtual environment:
+# pip install -r requirements.txt
