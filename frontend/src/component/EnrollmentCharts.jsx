@@ -33,13 +33,15 @@ const EnrollmentCharts = ({ data = [] }) => {
               drawTicks: false,
             },
             ticks: {
-              autoSkip: false,
-              maxRotation: 0,
+              autoSkip: true, // Enabling auto-skip
+              maxTicksLimit: window.innerWidth < 768 ? 6 : 12, // Limiting ticks on small screens
+              maxRotation: window.innerWidth < 768 ? 45 : 0, // Rotating labels on small screens
+              minRotation: window.innerWidth < 768 ? 45 : 0, // Minimum rotation
               padding: 10,
               color: '#333',
               font: {
                 weight: 'bold',
-              }
+              },
             }
           },
           y: {
