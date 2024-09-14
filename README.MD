@@ -115,6 +115,10 @@ AspireIT/
 - Tailwind CSS is used for styling, and Chart.js is used for chart rendering.
 - The project uses JWT for authentication, ensuring secure access to protected routes.
 
+## Contributing
+
+Feel free to open an issue or submit a pull request for any feature requests or bugs you encounter.
+
 ## Contact
 
 Feel free to reach out if you have any questions or want to connect!
