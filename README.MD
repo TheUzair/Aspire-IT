@@ -59,12 +59,10 @@ AspireIT/
 
 2. **Set Up the Database**:
    - Ensure that MySQL is installed and running on your machine.
-   - Create a database named `aspireit_db`.
-   - Populate the database by running the `schema.sql` script from the `database/` folder in MySQL Workbench or the MySQL command line:
-
-     ```bash
-     mysql -u <username> -p aspireit_db < schema.sql
-     ```
+   - Open MySQL Workbench and connect to your MySQL instance.
+   - Go to `Server` > `Data Import`.
+   - Select the `aspireit_db.sql` file from the `/database` folder.
+   - Import the file into a new or existing database.
 
 3. **Environment Variables**:
    - Create a `.env` file in the `backend` directory and add the following configuration:
