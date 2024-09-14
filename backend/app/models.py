@@ -32,7 +32,7 @@ class Child(db.Model):
 class Caregiver(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)  # A caregiver can be associated with multiple children
-    status = db.Column(db.String(20), nullable=False)  # Adding status column
+    status = db.Column(db.String(20), nullable=False)
 
     # Relationships
     children = db.relationship('Child', secondary='caregiver_child', backref='caregiver_children', lazy=True, overlaps="children,child_caregivers")
@@ -46,7 +46,7 @@ class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     child_id = db.Column(db.Integer, db.ForeignKey('child.id'))
     date = db.Column(db.Date, nullable=False)
-    status = db.Column(db.String(20), nullable=False)  # Updated to String type
+    status = db.Column(db.String(20), nullable=False)
 
     # Relationships
     child = db.relationship('Child', backref='attendance', lazy=True, overlaps="child_attendance,attendance_records")

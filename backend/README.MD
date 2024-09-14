@@ -18,7 +18,7 @@ Before setting up the project, ensure you have the following installed:
 First, clone the project repository to your local machine. If using Git:
 
 ```bash
-git clone <repository-url>
+git clone [https://github.com/TheUzair/Aspire-IT.git](https://github.com/TheUzair/Aspire-IT.git)
 cd aspireit-backend
 ```
 

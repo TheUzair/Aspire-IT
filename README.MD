@@ -1,3 +1,4 @@
+
 # AspireIT Project
 
 ## Project Overview
@@ -113,3 +114,11 @@ AspireIT/
 - The **frontend** folder contains the React components, including various charts and the dashboard UI.
 - Tailwind CSS is used for styling, and Chart.js is used for chart rendering.
 - The project uses JWT for authentication, ensuring secure access to protected routes.
+
+## Contact
+
+Feel free to reach out if you have any questions or want to connect!
+
+✉️ Email: [mohujer90@gmail.com](mailto:mohujer90@gmail.com)
+
+ LinkedIn: [@Mohd-Uzair](https://www.linkedin.com/in/mohd-uzair-33b166204/)

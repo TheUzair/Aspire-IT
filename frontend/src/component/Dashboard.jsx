@@ -373,7 +373,7 @@ const Dashboard = () => {
           </div>
 
           {/* Enrollment Overview */}
-          <div className="EnrollmentOverview w-2/3 md:flex-basis-full full-width-centered bg-white rounded-lg shadow-md">
+          <div className="EnrollmentOverview w-[60%] md:flex-basis-full full-width-centered bg-white rounded-lg shadow-md">
             <div className="heading flex justify-between items-center mb-2">
               <div className='flex gap-2 items-center pl-4 pt-4'>
                 <div className='pl-1'><img src="/enrollment.gif" alt="" width={30} height={30} /></div>

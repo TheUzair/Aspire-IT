@@ -1,58 +1,32 @@
-@media (max-width: 1440px) and (min-width: 1400px) {
-	.ml-1440 {
-	  margin-left: 40px;
-	}
-  }
-@media (max-width: 1399px) and (min-width: 1267px) {
-	.ml-1440 {
-	  margin-left: 21px;
-	}
-  }
-@media (max-width: 1266px) and (min-width: 1206px) {
-	.ml-1440 {
-	  margin-left: 11px;
-	}
-  }
-
-  @media (min-width: 1002px) and (max-width: 1145px) {
-	.maxWidth25rem {
-	  max-width: 24rem !important;
-	}
-  }
-  /* Attendance Chart */
-@media (min-width: 768px) and (max-width: 1023px) {
-	.display-chart-custom {
-	  height: 11rem;
-	}
-  }
-
-@media (min-width: 1024px) and (max-width: 1265px) {
-	.display-chart-custom {
-		height: 15rem;
-	}
-}
-
-@media (min-width: 1280px) and (max-width: 1535px) {
-	.display-chart-custom {
-		height: 20rem;
-	}
-}
-
-@media (min-width: 1536px) {
-	.display-chart-custom {
-		height: 12rem;
-	}
-}
-
+/* Each div should have full width for smaller screens */
 .full-width-centered {
 	width: 100%;
 	margin: 0 auto;
 	text-align: center;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 425px) {
 	.threecharts > div {
 		flex-basis: 100%;
 		max-width: 100%;
+	}
+} 
+
+/* Attendance Chart */
+@media (min-width: 768px) and (max-width: 1115px) {
+	.display-chart-custom {
+	  height: 11rem;
+	}
+  }
+
+@media (min-width: 1116px) and (max-width: 1535px) {
+	.display-chart-custom {
+		height: 20rem;
+	}
+}
+
+@media (min-width: 1441px) {
+	.display-chart-custom {
+		height: 12rem;
 	}
 }
