@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [message, setMessage] = useState('');
-  const [isLogin, setIsLogin] = useState(true); // Toggle between login and register
+  const [isLogin, setIsLogin] = useState(true); 
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
@@ -22,11 +22,11 @@ function Login() {
 
       const response = await axios.post(url, formData);
       if (isLogin) {
-        localStorage.setItem('token', response.data.access_token); // Save token to local storage
+        localStorage.setItem('token', response.data.access_token); 
         setMessage('Login successful');
-        navigate('/dashboard'); // Redirect to Dashboard
+        navigate('/dashboard');d
       } else {
-        setMessage(response.data.msg); // Show message for registration
+        setMessage(response.data.msg); 
       }
     } catch (error) {
       setMessage(error.response?.data?.msg || 'An error occurred');
@@ -34,16 +34,16 @@ function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h2 className="text-xl font-bold mb-6">{isLogin ? 'Login' : 'Register'}</h2>
-      <form onSubmit={handleSubmit} className="w-1/3">
+    <div className="flex flex-col items-center justify-center h-screen dark:bg-gray-900 bg-white">
+      <div className="text-xl font-bold mb-6 dark:text-white">{isLogin ? 'Login' : 'Register'}</div>
+      <form onSubmit={handleSubmit} className="w-1/3 bg-white dark:bg-gray-800 p-6 rounded shadow-md">
         <input
           type="text"
           name="username"
           placeholder="Username"
           value={formData.username}
           onChange={handleInputChange}
-          className="mb-4 p-2 w-full border"
+          className="mb-4 p-2 w-full border dark:bg-gray-700 dark:text-white"
         />
         <input
           type="password"
@@ -51,16 +51,16 @@ function Login() {
           placeholder="Password"
           value={formData.password}
           onChange={handleInputChange}
-          className="mb-4 p-2 w-full border"
+          className="mb-4 p-2 w-full border dark:bg-gray-700 dark:text-white"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 w-full">
+        <button type="submit" className="bg-blue-500 dark:bg-blue-700 text-white p-2 w-full">
           {isLogin ? 'Login' : 'Register'}
         </button>
       </form>
-      {message && <p className="mt-4">{message}</p>}
+      {message && <p className="mt-4 dark:text-white">{message}</p>}
       <button
         onClick={() => setIsLogin(!isLogin)}
-        className="text-blue-500 mt-4"
+        className="text-blue-500 dark:text-blue-400 mt-4"
       >
         {isLogin ? "Don't have an account? Register" : 'Already have an account? Login'}
       </button>

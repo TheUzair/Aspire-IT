@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       padding: {
@@ -14,8 +15,8 @@ export default {
         'custom-1075': '1075px',
       },
       maxWidth: {
-        '25rem': '25rem', // Define max-width of 25rem
-        '28rem': '28rem', // Existing max-width of 28rem
+        '25rem': '25rem', 
+        '28rem': '28rem',
       },
     }
   },

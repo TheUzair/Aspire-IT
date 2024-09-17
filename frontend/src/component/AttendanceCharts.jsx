@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import Chart from 'chart.js/auto';
+import { ThemeContext } from '../context/ThemeContext';
 
 const AttendanceCharts = ({ data = [] }) => {
+  const { theme } = useContext(ThemeContext);  
+
   useEffect(() => {
     const ctx = document.getElementById('cdDriveChart');
 
-    if (!ctx) return; // Ensure canvas is ready
+    if (!ctx) return; 
 
-    // Ensure data is an array before processing
     if (!Array.isArray(data)) return;
 
     // Extract data values from props
@@ -16,35 +18,40 @@ const AttendanceCharts = ({ data = [] }) => {
     const dayOffCount = data.filter(attendee => attendee.status === 'take day-off').length;
     const notPresentCount = data.filter(attendee => attendee.status === 'not-present').length;
 
-    // Destroy existing chart instance before creating a new one if needed
+    // Destroy existing chart instance before creating a new one
     if (window.chartInstance) {
       window.chartInstance.destroy();
     }
 
-    // Create a new chart
+    // Theme-based colors
+    const borderColor = theme === 'dark' ? '#1E293B' : '#FFFFFF';
+    const availableCount = theme === 'dark' ? '#FFFFFF' : '#000';
+    const totalCountColor = theme === 'dark' ? '#4B5563' : '#6B7280';
+
+    // A new chart
     window.chartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [{
           data: [onTimeCount, lateCount, dayOffCount, notPresentCount],
-          backgroundColor: ['#4B0082', '#FF0000', '#FFA500', '#808080'], // Indigo, Red, Orange, Gray
+          backgroundColor: ['#4B0082', '#FF0000', '#FFA500', '#808080'], 
           borderWidth: 5,
-          borderColor: '#fff',
+          borderColor: borderColor, 
           hoverOffset: 4,
           borderRadius: 10,
         }],
-        labels: ['On-time', 'Late-attendance', ' Day-off', 'Not-present'] // Labels for the chart
+        labels: ['On-time', 'Late-attendance', ' Day-off', 'Not-present'] 
       },
       options: {
         cutout: '70%', 
-        responsive: true, // Make the chart responsive
+        responsive: true, 
         maintainAspectRatio: false,
         plugins: {
           legend: {
             display: false,
           },
           tooltip: {
-            enabled: true // Disable default tooltips
+            enabled: true, 
           }
         }
       },
@@ -61,22 +68,24 @@ const AttendanceCharts = ({ data = [] }) => {
           ctx.save();
           ctx.textAlign = 'center';
           ctx.font = 'bold 24px Arial';
-          ctx.fillStyle = '#000';
-          ctx.fillText(`${onTimeCount + lateCount + dayOffCount + notPresentCount}`, centerX, centerY - 10);  // Display total attendance in center
+          ctx.fillStyle = availableCount; 
+
+          ctx.fillText(`${onTimeCount + lateCount + dayOffCount + notPresentCount}`, centerX, centerY - 10);  
           ctx.font = 'bold 18px Arial';
-          ctx.fillText('/2000', centerX, centerY + 20);  // Display capacity in center
+          ctx.fillStyle = totalCountColor;  
+          ctx.fillText('/2000', centerX, centerY + 20);  
           ctx.restore();
         }
       }]
     });
 
-    // Cleanup function to destroy chart on unmount
+    // Destroy chart on unmount
     return () => {
       if (window.chartInstance) {
         window.chartInstance.destroy();
       }
     };
-  }, [data]);
+  }, [data, theme]);  
 
   return (
     <div style={{ width: '100%', maxWidth: '1000px', height: '100%' }}>

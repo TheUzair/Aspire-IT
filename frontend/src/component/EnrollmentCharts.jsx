@@ -1,14 +1,22 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import Chart from 'chart.js/auto';
-
+import { ThemeContext } from '../context/ThemeContext';
 const EnrollmentCharts = ({ data = [] }) => {
+  const { theme } = useContext(ThemeContext); // Get the current theme
+
   useEffect(() => {
     const ctx = document.getElementById('enrollmentChart');
 
+    if (!ctx) return; 
+
     // Destroy the existing chart if it exists
-    if (ctx && ctx.chart) {
+    if (ctx.chart) {
       ctx.chart.destroy();
     }
+
+    // Define theme-based colors
+    const textColor = theme === 'dark' ? '#FFFFFF' : '#000000'; 
+    const gridColor = theme === 'dark' ? '#FFFFFF' : '#000000'; 
 
     // Create a new chart
     const chart = new Chart(ctx, {
@@ -24,7 +32,7 @@ const EnrollmentCharts = ({ data = [] }) => {
         }]
       },
       options: {
-        responsive: true, // responsive
+        responsive: true, 
         scales: {
           x: {
             grid: {
@@ -38,7 +46,7 @@ const EnrollmentCharts = ({ data = [] }) => {
               maxRotation: window.innerWidth < 768 ? 45 : 0, // Rotating labels on small screens
               minRotation: window.innerWidth < 768 ? 45 : 0, // Minimum rotation
               padding: 10,
-              color: '#333',
+              color: textColor,
               font: {
                 weight: 'bold',
               },
@@ -50,12 +58,12 @@ const EnrollmentCharts = ({ data = [] }) => {
               drawBorder: false,
               drawTicks: false,
               color: (context) => {
-                return context.tick.value === 0 ? 'transparent' : '#e0e0e0';
+                return context.tick.value === 0 ? 'transparent' : gridColor; 
               }
             },
             ticks: {
               padding: 15,
-              color: '#555',
+              color: textColor, 
               stepSize: 10,
               font: {
                 weight: 'bold',
@@ -67,7 +75,7 @@ const EnrollmentCharts = ({ data = [] }) => {
           legend: {
             display: false,
             labels: {
-              color: '#444',
+              color: textColor,
               font: {
                 weight: 'bold',
               }
@@ -78,9 +86,7 @@ const EnrollmentCharts = ({ data = [] }) => {
     });
 
     // Attach the chart instance to the canvas for future reference
-    if (ctx) {
-      ctx.chart = chart;
-    }
+    ctx.chart = chart;
 
     // Cleanup on component unmount
     return () => {
@@ -88,7 +94,7 @@ const EnrollmentCharts = ({ data = [] }) => {
         ctx.chart.destroy();
       }
     };
-  }, [data]);
+  }, [data, theme]);
 
   const getEnrollmentsByMonth = (enrollmentData) => {
     const months = [
@@ -116,8 +122,7 @@ const EnrollmentCharts = ({ data = [] }) => {
     <div className="w-full max-w-5xl h-full">
       <canvas id="enrollmentChart"></canvas>
     </div>
-
-
   );
 };
+
 export default EnrollmentCharts;

@@ -2,7 +2,7 @@ import pandas as pd
 from sqlalchemy import case, func
 from prophet import Prophet
 from .models import Enrollment, Attendance
-from . import db  # Use the db instance from __init__.py
+from . import db 
 
 def get_enrollment_data():
     # Query to fetch enrollment data from the database

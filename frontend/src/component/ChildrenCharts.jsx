@@ -1,18 +1,18 @@
-import { useEffect } from 'react'; 
+import { useEffect, useContext } from 'react'; 
 import Chart from 'chart.js/auto';
+import { ThemeContext } from '../context/ThemeContext';
 
-let chartInstance;  // Store the chart instance
+let chartInstance; 
 
 const ChildrenCharts = ({ data: childrenData = [] }) => {
+  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const canvas = document.getElementById('childrenOverview');
 
-    if (!canvas) return; // Ensure canvas is ready
+    if (!canvas) return;
 
-    // Set canvas internal resolution
-    canvas.width = 200;  // Set the width attribute
-    canvas.height = 200; // Set the height attribute
+  
 
     const ctx = canvas.getContext('2d');
 
@@ -21,35 +21,41 @@ const ChildrenCharts = ({ data: childrenData = [] }) => {
       chartInstance.destroy();
     }
 
-    // Calculate counts with default values
+   
     const activeCount = childrenData.filter(child => child.status === 'active').length || 0;
     const registeredCount = childrenData.filter(child => child.status === 'registered').length || 0;
     const inactiveCount = childrenData.filter(child => child.status === 'inactive').length || 0;
+
+    // Set chart colors based on the theme
+    const totalTextColor = theme === 'dark' ? '#4B5563' : '#6B7280';
+    const textColor = theme === 'dark' ? '#FFFFFF' : '#000';
+    const borderColor = theme === 'dark' ? '#1E293B' : '#FFFFFF'; 
 
     chartInstance = new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [{
           data: [registeredCount, activeCount, inactiveCount],
-          backgroundColor: ['#A52A2A', '#FFA500', '#D81B60'], // Brown, Orange, Yellow colors
-          borderWidth: 5, // Increase border width for visible gaps
-          borderRadius: 10, // Rounded edges for each slice
+          backgroundColor:  ['#A52A2A', '#FFA500', '#D81B60'],
+          borderColor: borderColor, 
+          borderWidth: 5,
+          borderRadius: 10,
           hoverOffset: 4,
         }],
-        labels: ['Registered', 'Active', 'Inactive'] // Labels for the chart
+        labels: ['Registered', 'Active', 'Inactive'] 
       },
       options: {
-        circumference: 180, // Semi-circle
-        rotation: -90, // Start from the top
-        cutout: '70%', // Increase cutout to make the doughnut shape thinner and enhance gap visibility
-        responsive: true, // Make the chart responsive
+        circumference: 180, 
+        rotation: -90,
+        cutout: '70%', 
+        responsive: true, 
         maintainAspectRatio: false,
         plugins: {
           legend: {
             display: false,
           },
           tooltip: {
-            enabled: true, // Tooltip will display on hover
+            enabled: true,
           },
         }
       },
@@ -64,29 +70,30 @@ const ChildrenCharts = ({ data: childrenData = [] }) => {
       
           ctx.save();
       
-          // Adjust the position for "Total" text and its count
+          // Center the position for "Total" text and its count
           ctx.textAlign = 'center';
           ctx.font = 'bold 20px Arial';
-          ctx.fillStyle = '#000';
-          ctx.fillText('Total', centerX, centerY + 30);  // Move "Total" text lower
-          ctx.fillText(registeredCount + activeCount + inactiveCount, centerX, centerY + 60);  // Move the number lower
+          ctx.fillStyle = totalTextColor;
+          ctx.fillText('Total', centerX, centerY + 30);  
+          ctx.fillStyle = textColor;
+          ctx.fillText(registeredCount + activeCount + inactiveCount, centerX, centerY + 60);
           ctx.restore();
         }
       }]
     });
 
-    // Cleanup function to destroy chart on unmount
+    // Destroy chart on unmount
     return () => {
       if (chartInstance) {
         chartInstance.destroy();
       }
     };
-  }, [childrenData]);
+  }, [childrenData, theme]); 
 
   return (
     <canvas 
       id="childrenOverview" 
-      style={{ width: '200px', height: '200px' }} // Adjust CSS width and height as needed
+      style={{ width: '200px', height: '200px' }}
     />
   );
 };

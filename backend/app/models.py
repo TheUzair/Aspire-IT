@@ -15,8 +15,14 @@ class LoginForm(Form):
     username = StringField('Username', [validators.InputRequired()])
     password = PasswordField('Password', [validators.InputRequired()])
 
+# Association Table
+caregiver_child = db.Table('caregiver_child',
+    db.Column('caregiver_id', db.Integer, db.ForeignKey('caregiver.id'), primary_key=True),
+    db.Column('child_id', db.Integer, db.ForeignKey('child.id'), primary_key=True)
+) 
 
 class Child(db.Model):
+    __tablename__ = 'child'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     age = db.Column(db.Integer, nullable=False)
@@ -30,17 +36,13 @@ class Child(db.Model):
     caregivers = db.relationship('Caregiver', secondary='caregiver_child', backref='child_caregivers', lazy=True, overlaps="caregivers,child_caregivers")
 
 class Caregiver(db.Model):
+    __tablename__ = 'caregiver'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)  # A caregiver can be associated with multiple children
     status = db.Column(db.String(20), nullable=False)
 
     # Relationships
     children = db.relationship('Child', secondary='caregiver_child', backref='caregiver_children', lazy=True, overlaps="children,child_caregivers")
-
-caregiver_child = db.Table('caregiver_child',
-    db.Column('caregiver_id', db.Integer, db.ForeignKey('caregiver.id'), primary_key=True),
-    db.Column('child_id', db.Integer, db.ForeignKey('child.id'), primary_key=True)
-)
 
 class Attendance(db.Model):
     id = db.Column(db.Integer, primary_key=True)

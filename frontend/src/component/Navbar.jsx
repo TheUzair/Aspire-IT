@@ -1,10 +1,12 @@
-import React, { useContext } from 'react';
+// src/component/Navbar.js
+import { useContext } from 'react';
+import { ThemeContext } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
-import { DarkModeContext } from '../context/DarkModeContext'; // Import DarkModeContext
 
 const Navbar = () => {
+  const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
-  const { isDarkMode, setIsDarkMode } = useContext(DarkModeContext); // Use context
+
 
   const handleSignOut = () => {
     localStorage.removeItem('token');
@@ -12,32 +14,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav
-      className={`bg-cyan-900 dark:bg-gray-800 text-white dark:text-gray-100`} // Dynamic background color
-    >
-      <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4">
-        <span className="self-center text-2xl font-semibold whitespace-nowrap text-white">AspireIt</span>
+    <nav className="bg-cyan-900 dark:bg-black sticky top-0 z-10">
+      <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl p-4 sticky">
+        <div className="text-cyan-50 self-center text-2xl font-semibold whitespace-nowrap dark:text-white">AspireIt</div>
 
         <div className="flex items-center space-x-6 rtl:space-x-reverse">
-          <button
-            type="button"
-            onClick={handleSignOut}
-            className="text-white bg-cyan-700 hover:bg-cyan-800 focus:outline-none focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:focus:ring-cyan-800"
-          >
+          <button type="button" onClick={handleSignOut} className="dark:bg-gray-700 dark:text-white bg-cyan-700 hover:bg-cyan-800 text-cyan-50 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
             Sign out
           </button>
 
-          <button
-            type="button"
-            onClick={() => setIsDarkMode(!isDarkMode)} // Toggle dark mode using context
-            style={{
-              backgroundColor: isDarkMode ? '#000000' : '#F8F9FA',
-              color: isDarkMode ? '#F8F9FA' : '#000000',
-              border: isDarkMode ? '1px solid #F8F9FA' : '1px solid #000000',
-            }}
-            className="hover:bg-gray-700 focus:outline-none focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2"
-          >
-            {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+          {/* Toggle theme button */}
+          <button type="button" onClick={toggleTheme} className="bg-white dark:bg-gray-600 dark:text-white font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2">
+            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
           </button>
         </div>
       </div>

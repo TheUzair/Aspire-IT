@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from .models import Child, Caregiver, Attendance, Financial, Enrollment, User
+from .models import Child, Caregiver, Attendance, Financial, Enrollment, User, caregiver_child
 from .ml_model import predict_enrollments, predict_attendance_trends
 from . import db, cache
 from datetime import datetime, timedelta, timezone
@@ -16,30 +16,51 @@ def manage_children():
     children_list = cache.get('children_list')
     if not children_list:
         children = Child.query.all()
-        children_list = [{"id": child.id, "name": child.name, "age": child.age, "status": child.status} for child in children]
+        children_list = [{"id": child.id, "name": child.name, "age": child.age, "status": child.status, "year": child.year} for child in children]
         cache.set('children_list', children_list, timeout=600)
-    
+    else:
+        # If the data is cached, ensuring that the year property is present
+        for child in children_list:
+            if 'year' not in child:
+                child['year'] = Child.query.get(child['id']).year
     return jsonify(children_list)
 
 @api_bp.route('/children', methods=['POST'])
 def add_child():
     data = request.json
-    new_child = Child(name=data['name'], age=data['age'], status=data['status'])
+    new_child = Child(name=data['name'], age=data['age'], status=data['status'], year=data['year'])
     db.session.add(new_child)
     db.session.commit()
-    cache.delete('children_list')  # Invalidate cache
+    cache.delete('children_list') 
     return jsonify({"message": "Child added successfully"}), 201
 
 @api_bp.route('/caregivers', methods=['GET'])
 def manage_caregivers():
-    caregivers_list = cache.get('caregivers_list')
+    year = request.args.get('year', None)  # Get the year parameter from the request
+    caregivers_list = cache.get(f'caregivers_list_{year}')  # Cache per year
+
     if not caregivers_list:
-        caregivers = Caregiver.query.all()
-        caregivers_list = [{"id": caregiver.id, "name": caregiver.name, "status": caregiver.status} for caregiver in caregivers]
-        cache.set('caregivers_list', caregivers_list, timeout=600)
-    
+        if year:
+            # Join Caregiver and Child, and filter based on the child's year
+            caregivers = Caregiver.query.join(caregiver_child).join(Child).filter(Child.year == year).all()
+        else:
+            caregivers = Caregiver.query.all()
+
+        # Prepare the caregivers_list with relevant attributes from the Caregiver and Child models
+        caregivers_list = [
+            {
+                "id": caregiver.id,
+                "name": caregiver.name,
+                "status": caregiver.status,
+                # For each caregiver, get the distinct year values from their associated children
+                "years": list(set(child.year for child in caregiver.children))
+            }
+            for caregiver in caregivers
+        ]
+        
+        cache.set(f'caregivers_list_{year}', caregivers_list, timeout=600)
+
     return jsonify(caregivers_list)
-   
 
 @api_bp.route('/caregivers', methods=['POST'])
 def add_caregiver():
@@ -47,27 +68,8 @@ def add_caregiver():
     new_caregiver = Caregiver(name=data['name'])
     db.session.add(new_caregiver)
     db.session.commit()
-    cache.delete('caregivers_list')  # Invalidate cache
+    cache.delete('caregivers_list')  
     return jsonify({"message": "Caregiver added successfully"}), 201
-
-@api_bp.route('/attendance', methods=['GET'])
-def manage_attendance():
-    attendance_list = cache.get('attendance_list')
-    if not attendance_list:
-        attendance_records = Attendance.query.all()
-        attendance_list = [{"id": record.id, "child_id": record.child_id, "date": record.date.isoformat(), "status": record.status} for record in attendance_records]
-        cache.set('attendance_list', attendance_list, timeout=600)
-    
-    return jsonify(attendance_list)
-
-@api_bp.route('/attendance', methods=['POST'])
-def add_attendance():
-    data = request.json
-    new_record = Attendance(child_id=data['child_id'], date=data['date'], status=data['status'])
-    db.session.add(new_record)
-    db.session.commit()
-    cache.delete('attendance_list')  # Invalidate cache
-    return jsonify({"message": "Attendance record added successfully"}), 201
 
 @api_bp.route('/financial', methods=['GET'])
 def manage_financial():
@@ -98,19 +100,25 @@ def add_financial_record():
     )
     db.session.add(new_record)
     db.session.commit()
-    cache.delete('financial_list')  # Invalidate cache
+    cache.delete('financial_list')
     return jsonify({"message": "Financial record added successfully"}), 201
 
 @api_bp.route('/financial-summary', methods=['GET'])
 def financial_summary():
     try:
-        # Get the date range (last 30 days)
-        end_date = datetime.now().date()
-        start_date = end_date - timedelta(days=30)
-        
-        # Query the Financial table for records in the last 30 days
+        # Get the selected year from query parameters
+        year = request.args.get('year', None)
+
+        if not year:
+            return jsonify({"error": "Year parameter is required"}), 400
+
+        # Filter financial records by year
+        start_date = datetime(int(year), 1, 1)
+        end_date = datetime(int(year), 12, 31)
+
+        # Query the Financial table for records in the selected year
         financial_data = Financial.query.filter(Financial.date.between(start_date, end_date)).all()
-        
+
         # Convert the query result to a list of dictionaries
         financial_data_list = [
             {
@@ -120,28 +128,28 @@ def financial_summary():
             }
             for f in financial_data
         ]
-        
+
         # Convert the list of dictionaries to a Pandas DataFrame
         df = pd.DataFrame(financial_data_list)
-        
+
         # Ensure the DataFrame is not empty
         if df.empty:
-            return jsonify({"message": "No financial data found in the last 30 days"}), 404
-        
+            return jsonify({"message": "No financial data found for the selected year"}), 404
+
         # Calculate total revenue
         total_revenue = df['amount'].sum()
-        
-        # Calculate total expenses (based on description)
+
+        # Calculate total expenses based on predefined categories
         expense_categories = ['Medical expenses', 'Sports activities', 'Extra classes', 'Monthly fee', 'Field trip']
         df_expenses = df[df['description'].isin(expense_categories)]
         total_expenses = df_expenses['amount'].sum()
-        
+
         # Calculate net income
         net_income = total_revenue - total_expenses
-        
+
         # Calculate profit margin
         profit_margin = (net_income / total_revenue) * 100 if total_revenue != 0 else 0
-        
+
         # Return the result as JSON
         return jsonify({
             "totalRevenue": int(total_revenue),
@@ -150,17 +158,41 @@ def financial_summary():
             "profitMargin": int(profit_margin)
         })
 
-    
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
+@api_bp.route('/attendance', methods=['GET'])
+def manage_attendance():
+    attendance_list = cache.get('attendance_list')
+    if not attendance_list:
+        attendance_records = Attendance.query.all()
+        attendance_list = [{"id": record.id, "child_id": record.child_id, "date": record.date.isoformat(), "status": record.status} for record in attendance_records]
+        cache.set('attendance_list', attendance_list, timeout=600)
+    
+    return jsonify(attendance_list)
+
+@api_bp.route('/attendance', methods=['POST'])
+def add_attendance():
+    data = request.json
+    new_record = Attendance(child_id=data['child_id'], date=data['date'], status=data['status'])
+    db.session.add(new_record)
+    db.session.commit()
+    cache.delete('attendance_list') 
+    return jsonify({"message": "Attendance record added successfully"}), 201
+
 # Routes without caching
+
 @api_bp.route('/enrollment', methods=['GET'])
 def manage_enrollment():
-    enrollments = Enrollment.query.all()
-    return jsonify([{"id": enrollment.id, "child_id": enrollment.child_id, "date": enrollment.date, "program": enrollment.program} for enrollment in enrollments])
-
+    year = request.args.get('year', default='2024')
+    enrollments = Enrollment.query.filter(Enrollment.date.like(f'{year}%')).all()
+    return jsonify([{
+        "id": enrollment.id,
+        "child_id": enrollment.child_id,
+        "date": enrollment.date,
+        "program": enrollment.program
+    } for enrollment in enrollments])
 
 @api_bp.route('/enrollment', methods=['POST'])
 def add_enrollment():
@@ -212,8 +244,6 @@ def get_week_range(date):
     return start_of_week, end_of_week
 
 def get_attendance_count(start_date, end_date):
-    print(f"Fetching attendance between {start_date} and {end_date}")
-    # Log the query result
     attendance_count = db.session.query(func.count(Attendance.id)).filter(
         Attendance.date >= start_date,
         Attendance.date <= end_date,

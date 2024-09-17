@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token'); // Get token from localStorage
-  const [redirectCountdown, setRedirectCountdown] = useState(3); // Set countdown to 3 seconds
+  const token = localStorage.getItem('token'); 
+  const [redirectCountdown, setRedirectCountdown] = useState(3); 
 
   useEffect(() => {
     if (!token) {
