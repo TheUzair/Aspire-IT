@@ -7,6 +7,7 @@ import CaregiversCharts from './CaregiversCharts';
 import ChildrenCharts from './ChildrenCharts';
 import EnrollmentCharts from './EnrollmentCharts';
 import AttendanceModal from './AttendanceModal';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Dashboard = () => {
   // State variables for dynamic data
@@ -16,18 +17,18 @@ const Dashboard = () => {
   const [enrollmentData, setEnrollmentData] = useState([])
   const [financialData, setFinancialData] = useState({});
   const [predictAttandance, setPredictAttandance] = useState([])
-  const [EnrollmentSummary, setEnrollmentSummary] = useState({})
-  const [childrenSelectedYear, setChildrenSelectedYear] = useState(2024);
+  const [childrenSelectedYear, setChildrenSelectedYear] = useState('2024');
   const [caregiversSelectedYear, setCaregiversSelectedYear] = useState('2024');
   const [financialSelectedYear, setFinancialSelectedYear] = useState('2024');
   const [enrollmentSelectedYear, setEnrollmentSelectedYear] = useState('2024'); // Default year
   const [openModal, setOpenModal] = useState(false);
+  const { theme } = useContext(ThemeContext);
 
 
   // Fetch Children Data
-  const fetchChildrenData = async () => {
+  const fetchChildrenData = async (year) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/children');
+      const response = await axios.get(`http://localhost:5000/api/children?year=${year}`);
       setChildrenData(response.data);
     } catch (error) {
       console.error("Error fetching children data", error);
@@ -87,24 +88,10 @@ const Dashboard = () => {
     }
   };
 
-  const fetchAttandancePrediction = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/predict-attendance');
-      setPredictAttandance(response.data);
-    } catch (error) {
-      console.error("Error fetching attandance prediction data", error);
-    }
-  };
 
-  const fetchEnrollmentSummary = async () => {
-    try {
-      const response = await axios.get('http://localhost:5000/api/enrollments-summary');
-      setEnrollmentSummary(response.data);
-    } catch (error) {
-      console.error("Error fetching enrollments summary data", error);
-    }
-  };
-
+  useEffect(() => {
+    fetchChildrenData(childrenSelectedYear);
+  }, [childrenSelectedYear]);
   // Fetch data when the component mounts
   useEffect(() => {
     fetchCaregiversData(caregiversSelectedYear);
@@ -121,19 +108,26 @@ const Dashboard = () => {
   }, [enrollmentSelectedYear]);
 
 
+
+
   // Fetch data when the component mounts
   useEffect(() => {
-    fetchChildrenData();
     fetchAttendanceStats();
   }, []);
 
 
   // Determine the content based on change_percentage
   const { change_percentage, current_week_attendance, last_week_attendance } = predictAttandance;
-  const isIncrease = typeof change_percentage === 'number' && change_percentage >= 0;
+
+  // Ensure change_percentage is a valid number
+  const validChangePercentage = !isNaN(change_percentage) && typeof change_percentage === 'number'
+    ? change_percentage
+    : 0; // Default to 0 if NaN
+
+  const isIncrease = validChangePercentage >= 0;
   const displayText = isIncrease
-    ? `${change_percentage} % more than last week's attendance`
-    : `${Math.abs(change_percentage)} % less than last week's attendance`;
+    ? `${validChangePercentage} % more than last week's attendance`
+    : `${Math.abs(validChangePercentage)} % less than last week's attendance`;
 
   // Create dynamic class names
   const bgColorClass = isIncrease ? 'bg-green-200 dark:bg-green-800' : 'bg-red-200 dark:bg-red-800';
@@ -141,10 +135,17 @@ const Dashboard = () => {
 
 
   // Filter children data based on the selected year
-  const filteredChildrenData = childrenData.filter(child => {
-    const childYear = child.year;
-    return childYear === parseInt(childrenSelectedYear); // Convert childrenSelectedYear to an integer
-  });
+  // const childrenData = childrenData.filter(child => {
+  //   const childYear = child.year;
+  //   return childYear === parseInt(childrenSelectedYear); // Convert childrenSelectedYear to an integer
+  // });
+
+   // Handle the change in year dropdown
+   const handleChildrenYearChange = (event) => {
+    const year = event.target.value;
+    setChildrenSelectedYear(year);
+    fetchChildrenData(year);  // Fetch data for the selected year
+  };
 
   // Handle the change in year dropdown
   const handleCaregiverYearChange = (event) => {
@@ -160,10 +161,11 @@ const Dashboard = () => {
     fetchFinancialData(year);
   };
 
-   // Handle year change
-   const handleEnrollmentYearChange = (event) => {
+  // Handle year change
+  const handleEnrollmentYearChange = (event) => {
     setEnrollmentSelectedYear(event.target.value);
   };
+
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
@@ -180,11 +182,11 @@ const Dashboard = () => {
     <>
       <div className="threecharts flex justify-between flex-wrap gap-10 p-8 md:justify-around dark:bg-gray-900 bg-white">
         {/* Children Overview */}
-        <div className="childrenOverview h-full flex-grow max-w-md xl:w-1/3 md:flex-basis-1/2 sm-flex-basis-full full-width-centered bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div className="childrenOverview h-full p-4 flex-grow max-w-md xl:w-1/3 md:flex-basis-1/2 sm-flex-basis-full full-width-centered bg-white dark:bg-gray-800 rounded-lg shadow-md">
           <div className="heading flex justify-between items-center">
             <div className="flex gap-2 items-center">
               <div className="pl-1">
-                <img src="children.gif" alt="" width={30} height={30} />
+                <img src="children2.gif" alt="" width={30} height={30} className={theme === 'dark' ? 'invert-image' : ''} />
               </div>
               <div className="font-semibold dark:text-white">Children Overview</div>
             </div>
@@ -193,7 +195,7 @@ const Dashboard = () => {
               <select
                 className="block appearance-none w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                 value={childrenSelectedYear}
-                onChange={(e) => setChildrenSelectedYear(e.target.value)} // Update the selected year
+                onChange={handleChildrenYearChange}
               >
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
@@ -206,42 +208,53 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+          <div>
+            {theme === 'dark' ? (
+              <Divider sx={{ backgroundColor: 'white', opacity: 0.1 }} />
+            ) : (
+              <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+            )}
+          </div>
+
 
           <div className="display-chart flex justify-center items-center p-5 h-64">
-            <ChildrenCharts data={filteredChildrenData} />
+            <ChildrenCharts data={childrenData} />
           </div>
 
           <div className="flex justify-center my-4">
-            <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} style={{ width: '90%' }} />
+            {theme === 'dark' ? (
+              <Divider sx={{ backgroundColor: 'white', opacity: 0.1 }} style={{ width: '90%' }} />
+            ) : (
+              <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} style={{ width: '90%' }} />
+            )}
           </div>
 
           <div className="stats flex justify-evenly m-4">
             {/* Display dynamic children stats */}
             <div className="registered flex flex-col items-center">
-              <div className="w-2 h-2 bg-cyan-950 rounded-full mb-2"></div>
+              <div className="w-2 h-2 bg-fuchsia-600 rounded-full mb-2"></div>
               <div className="text-gray-400 dark:text-gray-300 font-semibold">Registered</div>
-              <div className="font-bold dark:text-white">{filteredChildrenData.filter(child => child.status === 'registered').length}</div>
+              <div className="font-bold dark:text-white">{childrenData.filter(child => child.status === 'registered').length}</div>
             </div>
             <div className="active flex flex-col items-center">
               <div className="w-2 h-2 bg-orange-600 rounded-full mb-2"></div>
               <div className="text-gray-400 dark:text-gray-300 font-semibold">Active</div>
-              <div className="font-bold dark:text-white">{filteredChildrenData.filter(child => child.status === 'active').length}</div>
+              <div className="font-bold dark:text-white">{childrenData.filter(child => child.status === 'active').length}</div>
             </div>
             <div className="inactive flex flex-col items-center">
               <div className="w-2 h-2 bg-pink-600 rounded-full mb-2"></div>
               <div className="text-gray-400 dark:text-gray-300 font-semibold">Inactive</div>
-              <div className="font-bold dark:text-white">{filteredChildrenData.filter(child => child.status === 'inactive').length}</div>
+              <div className="font-bold dark:text-white">{childrenData.filter(child => child.status === 'inactive').length}</div>
             </div>
           </div>
         </div>
 
         {/* Caregivers Overview */}
-        <div className="caregiverOverview h-full flex-grow max-w-md xl:w-1/3 md:flex-basis-1/2 full-width-centered bg-white dark:bg-gray-800 dark:text-white rounded-lg shadow-md">
+        <div className="caregiverOverview h-full p-4 flex-grow max-w-md xl:w-1/3 md:flex-basis-1/2 full-width-centered bg-white dark:bg-gray-800 dark:text-white rounded-lg shadow-md">
           <div className="heading flex justify-between items-center">
             <div className='flex gap-2 items-center'>
               <div className='pl-1'>
-                <img src="/caregivers.gif" alt="" width={30} height={30} />
+                <img src="/caregivers1.gif" alt="" width={30} height={30} className={theme === 'dark' ? 'invert-image' : ''} />
               </div>
               <div className="font-semibold">Caregiver Overview</div>
             </div>
@@ -261,15 +274,25 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+          <div>
+            {theme === 'dark' ? (
+              <Divider sx={{ backgroundColor: 'white', opacity: 0.1 }} />
+            ) : (
+              <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+            )}
+          </div>
 
-          <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
 
           <div className="display-chart flex justify-center items-center p-5 h-64">
             <CaregiversCharts data={caregiversData} />
           </div>
 
           <div className="flex justify-center my-4">
-            <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} style={{ width: '90%' }} />
+            {theme === 'dark' ? (
+              <Divider sx={{ backgroundColor: 'white', opacity: 0.1 }} style={{ width: '90%' }} />
+            ) : (
+              <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} style={{ width: '90%' }} />
+            )}
           </div>
 
           <div className="caregiverstats flex justify-evenly m-4">
@@ -298,11 +321,11 @@ const Dashboard = () => {
         </div>
 
         {/* Financial Overview */}
-        <div className="financialOverview h-full flex-grow max-w-md xl:w-1/3 md:flex-basis-1/2 full-width-centered bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div className="financialOverview h-full p-4 flex-grow max-w-md xl:w-1/3 md:flex-basis-1/2 full-width-centered bg-white dark:bg-gray-800 rounded-lg shadow-md">
           <div className="heading flex justify-between items-center">
             <div className='flex gap-2 items-center'>
               <div className='pl-1'>
-                <img src="/financial.gif" alt="" width={30} height={30} />
+                <img src="/financial1.gif" alt="" width={30} height={30} className={theme === 'dark' ? 'invert-image' : ''} />
               </div>
               <div className="font-semibold dark:text-gray-100">Financial Overview</div>
             </div>
@@ -323,7 +346,14 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <Divider sx={{ backgroundColor: 'black', opacity: 0.1, margin: 'auto' }} />
+          <div>
+            {theme === 'dark' ? (
+              <Divider sx={{ backgroundColor: 'white', opacity: 0.1 }} />
+            ) : (
+              <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+            )}
+          </div>
+
 
 
           <div className="outcome grid grid-cols-2 gap-4 p-3">
@@ -381,7 +411,7 @@ const Dashboard = () => {
 
           <div className="flex items-center bg-blue-50 dark:bg-gray-700 rounded-lg m-3 p-2">
             <div>
-              <img src="/info.gif" alt="" width={24} height={24} />
+              <img src="/info1.gif" alt="" width={24} height={24} className={theme === 'dark' ? 'invert-image' : ''} />
             </div>
             <div className="ml-2 text-cyan-700 dark:text-cyan-300">Check daily to keep it on track</div>
           </div>
@@ -389,19 +419,26 @@ const Dashboard = () => {
 
         {/* Attendance Overview */}
         <div className="Attendance w-1/2 max-w-md maxWidth25rem md:flex-basis-1/2 full-width-centered bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-          <div className="heading flex justify-between items-center mb-2">
+          <div className="heading flex justify-between items-center mt-2 mb-3">
             <div className='flex gap-2 items-center'>
               <div className='pl-1'>
-                <img src="/attendance.gif" alt="" width={30} height={30} />
+                <img src="/attendance1.gif" alt="" width={30} height={30} className={theme === 'dark' ? 'invert-image' : ''} />
               </div>
               <div className="font-semibold text-black dark:text-white">Attendance</div>
             </div>
-            <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+
+
             <div className="font-semibold bg-blue-100 dark:bg-gray-700 rounded-lg p-2 cursor-pointer" onClick={handleOpenModal}>
               <div className="text-black dark:text-gray-300">View Stats</div>
             </div>
           </div>
-
+          <div>
+            {theme === 'dark' ? (
+              <Divider sx={{ backgroundColor: 'white', opacity: 0.1 }} />
+            ) : (
+              <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+            )}
+          </div>
           <div className="display-chart-custom flex justify-center items-center p-5">
             <AttendanceCharts data={attendanceStats} />
           </div>
@@ -433,7 +470,7 @@ const Dashboard = () => {
             </div>
             <div className={`${bgColorClass} p-3 rounded-lg flex items-center gap-2 mt-5`}>
               <div className={`${textColorClass} font-bold`}>
-                <img src={isIncrease ? "/increase.gif" : "/decrease.gif"} alt="" width={30} height={30} />
+                <img src={isIncrease ? "/increase.gif" : "/decrease.gif"} alt="" width={30} height={30} className={theme === 'dark' ? 'invert-image' : ''} />
               </div>
               <div className={textColorClass}>
                 {displayText}
@@ -455,11 +492,11 @@ const Dashboard = () => {
         </AttendanceModal>
 
         {/* Enrollment Overview */}
-        <div className="EnrollmentOverview w-[62%] md:flex-basis-full full-width-centered bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div className="EnrollmentOverview w-[62%] p-4 md:flex-basis-full full-width-centered bg-white dark:bg-gray-800 rounded-lg shadow-md">
           <div className="heading flex justify-between items-center mb-2">
-            <div className='flex gap-2 items-center pl-4 pt-4'>
+            <div className='flex gap-2 items-center'>
               <div className='pl-1'>
-                <img src="/enrollment.gif" alt="" width={30} height={30} />
+                <img src="/enrollment1.gif" alt="" width={30} height={30} className={theme === 'dark' ? 'invert-image' : ''} />
               </div>
               <div className="font-semibold text-black dark:text-white">Enrollments Record</div>
             </div>
@@ -481,19 +518,20 @@ const Dashboard = () => {
             </div>
           </div>
 
-          <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+          <div>
+            {theme === 'dark' ? (
+              <Divider sx={{ backgroundColor: 'white', opacity: 0.1 }} />
+            ) : (
+              <Divider sx={{ backgroundColor: 'black', opacity: 0.1 }} />
+            )}
+          </div>
+
           <div className='h-full'>
             <EnrollmentCharts data={enrollmentData} />
           </div>
         </div>
 
       </div>
-
-
-
-
-
-
     </>
   );
 };

@@ -26,7 +26,7 @@ const EnrollmentCharts = ({ data = [] }) => {
         datasets: [{
           label: false,
           data: getEnrollmentsByMonth(data).map(item => item.count),
-          backgroundColor: 'purple',
+          backgroundColor: 'DarkCyan',
           barThickness: 10,
           borderRadius: 10,
         }]

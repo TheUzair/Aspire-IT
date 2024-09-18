@@ -33,7 +33,7 @@ const CaregiversCharts = ({ data: caregiversData = [] }) => {
       data: {
         datasets: [{
           data: [registeredCount, activeCount, inactiveCount],
-          backgroundColor: ['#00008B', '#0000FF', '#ADD8E6'], 
+          backgroundColor: ['#4F46E5', '#0000FF', '#ADD8E6'], 
           borderColor: borderColor,
           borderWidth: 5,
           borderRadius: 10,

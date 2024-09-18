@@ -89,3 +89,7 @@
   .modal-open {
 	overflow: hidden; /* Prevent scrolling */
   }
+
+  .invert-image {
+	filter: invert(1) contrast(0.7);
+  }

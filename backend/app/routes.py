@@ -13,16 +13,33 @@ api_bp = Blueprint('api', __name__)
 # Cached by Redis
 @api_bp.route('/children', methods=['GET'])
 def manage_children():
-    children_list = cache.get('children_list')
+    # Get the year from the query parameters
+    year = request.args.get('year')
+
+    # Cache key based on year, so cached data is unique for each year
+    cache_key = f'children_list_{year}' if year else 'children_list'
+
+    # Try to get data from cache
+    children_list = cache.get(cache_key)
+
     if not children_list:
-        children = Child.query.all()
-        children_list = [{"id": child.id, "name": child.name, "age": child.age, "status": child.status, "year": child.year} for child in children]
-        cache.set('children_list', children_list, timeout=600)
-    else:
-        # If the data is cached, ensuring that the year property is present
-        for child in children_list:
-            if 'year' not in child:
-                child['year'] = Child.query.get(child['id']).year
+        # If cache is empty, query from the database
+        if year:
+            # Query only children for the specified year
+            children = Child.query.filter_by(year=year).all()
+        else:
+            # Query all children if no year is provided
+            children = Child.query.all()
+
+        # Create the list to cache
+        children_list = [
+            {"id": child.id, "name": child.name, "age": child.age, "status": child.status, "year": child.year}
+            for child in children
+        ]
+
+        # Cache the result with a timeout of 600 seconds
+        cache.set(cache_key, children_list, timeout=600)
+
     return jsonify(children_list)
 
 @api_bp.route('/children', methods=['POST'])

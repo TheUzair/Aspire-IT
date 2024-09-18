@@ -34,7 +34,7 @@ const AttendanceCharts = ({ data = [] }) => {
       data: {
         datasets: [{
           data: [onTimeCount, lateCount, dayOffCount, notPresentCount],
-          backgroundColor: ['#4B0082', '#FF0000', '#FFA500', '#808080'], 
+          backgroundColor: ['#4B0082', '#FF0000', '#FFA500', '#67E8F9'], 
           borderWidth: 5,
           borderColor: borderColor, 
           hoverOffset: 4,

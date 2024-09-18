@@ -18,6 +18,9 @@ export default {
         '25rem': '25rem', 
         '28rem': '28rem',
       },
+      colors: {
+        'regal-blue': '#243c5a',
+      },
     }
   },
   plugins: [],

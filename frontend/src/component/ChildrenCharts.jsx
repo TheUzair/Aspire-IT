@@ -36,7 +36,7 @@ const ChildrenCharts = ({ data: childrenData = [] }) => {
       data: {
         datasets: [{
           data: [registeredCount, activeCount, inactiveCount],
-          backgroundColor:  ['#A52A2A', '#FFA500', '#D81B60'],
+          backgroundColor:  ['#D946EF', '#D97706', '#DB2777'],
           borderColor: borderColor, 
           borderWidth: 5,
           borderRadius: 10,
