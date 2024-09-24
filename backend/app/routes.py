@@ -178,7 +178,6 @@ def financial_summary():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @api_bp.route('/attendance', methods=['GET'])
 def manage_attendance():
     attendance_list = cache.get('attendance_list')

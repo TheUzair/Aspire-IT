@@ -1,18 +1,18 @@
 import { useEffect, useContext } from 'react'; 
 import Chart from 'chart.js/auto';
 import { ThemeContext } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 let chartInstance; 
 
 const ChildrenCharts = ({ data: childrenData = [] }) => {
   const { theme } = useContext(ThemeContext);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const canvas = document.getElementById('childrenOverview');
 
     if (!canvas) return;
-
-  
 
     const ctx = canvas.getContext('2d');
 
@@ -74,7 +74,7 @@ const ChildrenCharts = ({ data: childrenData = [] }) => {
           ctx.textAlign = 'center';
           ctx.font = 'bold 20px Arial';
           ctx.fillStyle = totalTextColor;
-          ctx.fillText('Total', centerX, centerY + 30);  
+          ctx.fillText(t('total'), centerX, centerY + 30);  
           ctx.fillStyle = textColor;
           ctx.fillText(registeredCount + activeCount + inactiveCount, centerX, centerY + 60);
           ctx.restore();
@@ -88,7 +88,7 @@ const ChildrenCharts = ({ data: childrenData = [] }) => {
         chartInstance.destroy();
       }
     };
-  }, [childrenData, theme]); 
+  }, [childrenData, theme, t]); 
 
   return (
     <canvas 

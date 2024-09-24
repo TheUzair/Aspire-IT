@@ -1,8 +1,11 @@
 import React, { useEffect, useContext } from 'react';
 import Chart from 'chart.js/auto';
+import { useTranslation } from 'react-i18next';
 import { ThemeContext } from '../context/ThemeContext';
+
 const EnrollmentCharts = ({ data = [] }) => {
-  const { theme } = useContext(ThemeContext); // Get the current theme
+  const { theme } = useContext(ThemeContext); 
+  const { t } = useTranslation(); 
 
   useEffect(() => {
     const ctx = document.getElementById('enrollmentChart');
@@ -18,11 +21,10 @@ const EnrollmentCharts = ({ data = [] }) => {
     const textColor = theme === 'dark' ? '#FFFFFF' : '#000000'; 
     const gridColor = theme === 'dark' ? '#FFFFFF' : '#000000'; 
 
-    // Create a new chart
     const chart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: getEnrollmentsByMonth(data).map(item => item.month),
+        labels: getEnrollmentsByMonth(data).map(item => t(item.month)),
         datasets: [{
           label: false,
           data: getEnrollmentsByMonth(data).map(item => item.count),
@@ -41,10 +43,10 @@ const EnrollmentCharts = ({ data = [] }) => {
               drawTicks: false,
             },
             ticks: {
-              autoSkip: true, // Enabling auto-skip
-              maxTicksLimit: window.innerWidth < 768 ? 6 : 12, // Limiting ticks on small screens
-              maxRotation: window.innerWidth < 768 ? 45 : 0, // Rotating labels on small screens
-              minRotation: window.innerWidth < 768 ? 45 : 0, // Minimum rotation
+              autoSkip: true, 
+              maxTicksLimit: window.innerWidth < 768 ? 6 : 12, 
+              maxRotation: window.innerWidth < 768 ? 45 : 0, 
+              minRotation: window.innerWidth < 768 ? 45 : 0, 
               padding: 10,
               color: textColor,
               font: {
@@ -72,6 +74,15 @@ const EnrollmentCharts = ({ data = [] }) => {
           }
         },
         plugins: {
+          tooltip: {
+            callbacks: {
+              label: (tooltipItem) => {
+                const month = tooltipItem.label; 
+                const count = tooltipItem.raw;
+                return `${t(month)}: ${count}`;
+              }
+            }
+          },
           legend: {
             display: false,
             labels: {
@@ -94,7 +105,7 @@ const EnrollmentCharts = ({ data = [] }) => {
         ctx.chart.destroy();
       }
     };
-  }, [data, theme]);
+  }, [data, theme, t]); 
 
   const getEnrollmentsByMonth = (enrollmentData) => {
     const months = [

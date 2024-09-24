@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next'; 
 
 const ProtectedRoute = ({ children }) => {
+  const { t } = useTranslation();
   const token = localStorage.getItem('token'); 
   const [redirectCountdown, setRedirectCountdown] = useState(3); 
 
@@ -26,15 +28,15 @@ const ProtectedRoute = ({ children }) => {
   if (!token) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-lg font-semibold mb-4">
-          You are not logged in. Redirecting you to login in {redirectCountdown}s...
+        <p className="text-lg font-semibold mb-4 dark:text-white">
+          {t('not_logged_in_message', { seconds: redirectCountdown })} 
         </p>
-        {redirectCountdown <= 0 && <Navigate to="/" />} {/* Trigger redirect */}
+        {redirectCountdown <= 0 && <Navigate to="/" />} 
       </div>
     );
   }
 
-  return children; // Render the protected content if token exists
+  return children; 
 };
 
 export default ProtectedRoute;

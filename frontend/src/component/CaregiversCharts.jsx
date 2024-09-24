@@ -1,12 +1,14 @@
 import { useEffect, useContext } from 'react';
 import Chart from 'chart.js/auto';
 import { ThemeContext } from '../context/ThemeContext';  
+import { useTranslation } from 'react-i18next';
 
 let chartInstance; 
 
 const CaregiversCharts = ({ data: caregiversData = [] }) => {
   const { theme } = useContext(ThemeContext);  
-
+  const { t } = useTranslation();
+  
   useEffect(() => {
     const canvas = document.getElementById('caregiversOverview');
 
@@ -71,7 +73,7 @@ const CaregiversCharts = ({ data: caregiversData = [] }) => {
           ctx.textAlign = 'center';
           ctx.font = 'bold 20px Arial';
           ctx.fillStyle = totalTextColor;
-          ctx.fillText('Total', centerX, centerY + 30);  
+          ctx.fillText(t('total'), centerX, centerY + 30);  
           ctx.fillStyle = textColor;
           ctx.fillText(registeredCount + activeCount + inactiveCount, centerX, centerY + 60);  
           ctx.restore();
@@ -85,7 +87,7 @@ const CaregiversCharts = ({ data: caregiversData = [] }) => {
         chartInstance.destroy();
       }
     };
-  }, [caregiversData, theme]);  
+  }, [caregiversData, theme, t]);  
   return (
     <canvas 
       id="caregiversOverview" 

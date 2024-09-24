@@ -1,9 +1,13 @@
 import React, { useEffect, useContext } from 'react';
 import Chart from 'chart.js/auto';
 import { ThemeContext } from '../context/ThemeContext';
+import '../App.css';
+import { useTranslation } from 'react-i18next';
+
 
 const AttendanceCharts = ({ data = [] }) => {
   const { theme } = useContext(ThemeContext);  
+  const { t } = useTranslation();
 
   useEffect(() => {
     const ctx = document.getElementById('cdDriveChart');
@@ -85,7 +89,7 @@ const AttendanceCharts = ({ data = [] }) => {
         window.chartInstance.destroy();
       }
     };
-  }, [data, theme]);  
+  }, [data, theme, t]);  
 
   return (
     <div style={{ width: '100%', maxWidth: '1000px', height: '100%' }}>
