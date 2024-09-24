@@ -46,27 +46,27 @@ AspireIT/
 │   │   ├── FinancialOverview.jsx    # Displays the financial overview
 │   │   ├── Footer.jsx
 │   │   ├── Homepage.jsx
-│   │   ├── language-selector.jsx    # Select from the available languages
+│   │   ├── language-selector.jsx    # Component to select from the available languages (i18n support)
 │   │   ├── Login.jsx
 │   │   ├── Navbar.jsx
 │   │   ├── Prediction.jsx
 │   │   ├── ProtectedRoute.jsx
 │   │   ├── Register.jsx
-│   ├── context/                 # Context providers for managing DarkMode state
-│   ├── App.css                  # Global styles for the frontend
-│   ├── App.jsx                  # Root component for the frontend
-│   ├── i18n.js                  # Internationalization configuration
-│   ├── index.css                # Main CSS file for the frontend
-│   ├── main.jsx                 # Main entry point for React app
-├── .eslint.config.js            # ESLint configuration for coding standards
-├── index.html                   # Main HTML entry point for the frontend
-├── LICENSE                      # Project license (MIT)
-├── package.json                 # Project metadata and scripts for frontend
-├── package-lock.json            # Dependency lock file for frontend
-├── postcss.config.js            # PostCSS configuration for Tailwind and CSS processing
-├── README.md                    # Project documentation (this file)
-├── tailwind.config.js           # Tailwind CSS configuration
-├── vite.config.js               # Vite.js configuration for bundling and serving frontend code
+│   ├── context/                     # Context providers for managing DarkMode state
+│   ├── App.css                      # Global styles for the frontend
+│   ├── App.jsx                      # Root component for the frontend
+│   ├── i18n.js                      # Internationalization configuration
+│   ├── index.css                    # Main CSS file for the frontend
+│   ├── main.jsx                     # Main entry point for React app
+├── .eslint.config.js                # ESLint configuration for coding standards
+├── index.html                       # Main HTML entry point for the frontend
+├── LICENSE                          # Project license (MIT)
+├── package.json                     # Project metadata and scripts for frontend
+├── package-lock.json                # Dependency lock file for frontend
+├── postcss.config.js                # PostCSS configuration for Tailwind and CSS processing
+├── README.md                        # Project documentation (this file)
+├── tailwind.config.js               # Tailwind CSS configuration
+├── vite.config.js                   # Vite.js configuration for bundling and serving frontend code
 ```
 
 ## Setup Instructions
